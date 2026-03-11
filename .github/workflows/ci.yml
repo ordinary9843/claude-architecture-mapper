@@ -1,0 +1,46 @@
+name: Claude Architecture Mapper
+
+on:
+  pull_request:
+    paths:
+      - 'skills/**/SKILL.md'
+      - 'skills/**/references/*.md'
+      - 'skills/**/examples/*.md'
+      - 'CLAUDE.md'
+  push:
+    branches: [ master ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install anthropic pyyaml requests markdown
+
+      - name: Run Architecture Mapper Audit
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Only run if an Anthropic API key is provided
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "ANTHROPIC_API_KEY is not set. Skipping automated audit."
+            echo "To enable automated PR reviews, add ANTHROPIC_API_KEY to your repository secrets."
+            exit 0
+          fi
+          python scripts/ci.py

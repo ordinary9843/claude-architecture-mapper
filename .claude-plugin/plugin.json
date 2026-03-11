@@ -1,0 +1,24 @@
+{
+  "name": "architecture-mapper",
+  "description": "Scans your Claude Code plugin ecosystem and generates an ARCHITECTURE.md with Mermaid.js dependency graphs, collision reports, and ecosystem health scores.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jerry Chen",
+    "email": "ordinary9843@gmail.com"
+  },
+  "homepage": "https://github.com/ordinary9843/claude-architecture-mapper",
+  "repository": "https://github.com/ordinary9843/claude-architecture-mapper",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "architecture-diagram",
+    "dependency-graph",
+    "mermaid",
+    "visualization",
+    "documentation-generator",
+    "static-analysis",
+    "developer-tools",
+    "productivity"
+  ]
+}
