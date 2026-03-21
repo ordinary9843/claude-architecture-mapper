@@ -94,10 +94,11 @@ For every file found, Read it and extract:
 | `size_kb` | Estimate from line count (100 lines ≈ 3 KB) |
 | `trigger` | Slash command in description or frontmatter (e.g. `/audit`) |
 | `governance` | `disable-model-invocation: true` flag |
+| `hidden` | `hide-from-slash-command-tool: true` flag — mark trigger as `hidden` in inventory |
 | `source` | `global` (from `<home>/.claude/`) or `project` (from cwd) |
 | `plugin` | Parent plugin name from path (e.g. `claude-code-guide`) |
 
-Build a registry: `name → { path, type, description, model, trigger, size_kb, source, plugin }`.
+Build a registry: `name → { path, type, description, model, trigger, hidden, size_kb, source, plugin }`.
 
 **Size estimate formula**: `size_kb = ceil(lineCount / 33)` — 33 lines ≈ 1 KB. Round up.
 
@@ -108,6 +109,10 @@ Build a registry: `name → { path, type, description, model, trigger, size_kb, 
 - **`<home>/.claude/` does not exist**: Skip the global scope scan. Note "Global scope unavailable" in the Ecosystem Health table.
 - **`ARCHITECTURE.md` exists but has no sentinel markers**: Append the full structure (including `<!-- START_METAMAP -->` / `<!-- END_METAMAP -->` markers) at the end of the file.
 - **Checklist item fails at Step 5**: Fix the violation before writing — do not write a broken graph. If a violation cannot be resolved deterministically (e.g., two components produce the same sanitized node ID after truncation), append `_2` to the second node ID and continue. Do not stop silently.
+
+### 2e.1 Version Deduplication
+
+If a plugin appears under multiple hash-named or version-named subdirectories (e.g., `ralph-loop/b664e.../`, `ralph-loop/da61.../`), use only the **first result returned by Glob** for each unique plugin name. Record the skipped paths as "duplicate versions — skipped" and do not include them in the registry.
 
 ---
 
@@ -199,7 +204,7 @@ Structure the full file as:
 
 | Name | Type | Source Plugin | Trigger | Model | Size | Governance |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| name | Skill/Agent/Command | plugin-name | /cmd | sonnet | 4KB | 🔒 no-invoke |
+| name | Skill/Agent/Command | plugin-name | /cmd or hidden | sonnet | 4KB | 🔒 no-invoke |
 
 ## Collision Report
 
@@ -244,6 +249,7 @@ Before writing, verify:
 - [ ] Node count is within the correct scale rule
 - [ ] Collision table is filled (even if "None detected.")
 - [ ] Inventory table has one row per component found
+- [ ] `hidden` commands show `hidden` in the Trigger column
 - [ ] Error handling applied for any missing frontmatter or unresolvable home path
 
 ---
