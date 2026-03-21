@@ -52,6 +52,9 @@ Use Glob with absolute paths to search these locations (substitute `<home>` with
 <home>/.claude/plugins/cache/**/.claude/agents/*.md
 ```
 
+> Scan `plugins/cache/` only — this contains active installed plugins.
+> `plugins/marketplaces/` is the download catalogue; skip it entirely.
+
 ### 2b. Project Scope — Current Working Directory
 
 ```text
