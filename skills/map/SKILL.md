@@ -30,18 +30,26 @@ If either file cannot be read or is empty, report: `Error: required reference fi
 
 Scan **both** scopes. Deduplicate by absolute path.
 
-### 2a. Global Scope — User's Full Claude Environment
+### 2a. Global Scope — Pre-flight: Resolve Home Directory
 
-Use Glob to search these paths (these capture all installed plugins and user-level config):
+> **IMPORTANT**: The Glob tool does not expand `~`. You must use the absolute home path.
+
+Derive the home directory from the `<base_dir>` value in the `<command-message>` header:
+- Extract the segment up to and including the username (e.g., `/Users/jerry` or `/home/jerry`)
+- Construct `<home>/.claude/` as the global root
+
+If `<home>/.claude/` cannot be derived, note "Global scope unavailable" in the Ecosystem Health table and skip to Step 2b.
+
+Use Glob with absolute paths to search these locations (substitute `<home>` with the resolved value):
 
 ```text
-~/.claude/agents/*.md
-~/.claude/commands/*.md
-~/.claude/skills/**/SKILL.md
-~/.claude/plugins/cache/**/skills/**/SKILL.md
-~/.claude/plugins/cache/**/agents/*.md
-~/.claude/plugins/cache/**/.claude/commands/*.md
-~/.claude/plugins/cache/**/.claude/agents/*.md
+<home>/.claude/agents/*.md
+<home>/.claude/commands/*.md
+<home>/.claude/skills/**/SKILL.md
+<home>/.claude/plugins/cache/**/skills/**/SKILL.md
+<home>/.claude/plugins/cache/**/agents/*.md
+<home>/.claude/plugins/cache/**/.claude/commands/*.md
+<home>/.claude/plugins/cache/**/.claude/agents/*.md
 ```
 
 ### 2b. Project Scope — Current Working Directory
@@ -83,7 +91,7 @@ For every file found, Read it and extract:
 | `size_kb` | Estimate from line count (100 lines ≈ 3 KB) |
 | `trigger` | Slash command in description or frontmatter (e.g. `/audit`) |
 | `governance` | `disable-model-invocation: true` flag |
-| `source` | `global` (from ~/.claude/) or `project` (from cwd) |
+| `source` | `global` (from `<home>/.claude/`) or `project` (from cwd) |
 | `plugin` | Parent plugin name from path (e.g. `claude-code-guide`) |
 
 Build a registry: `name → { path, type, description, model, trigger, size_kb, source, plugin }`.
@@ -94,7 +102,7 @@ Build a registry: `name → { path, type, description, model, trigger, size_kb, 
 
 - **No artifacts found**: Write a minimal `ARCHITECTURE.md` with all tables showing "None detected." — do not stop silently.
 - **File with no frontmatter**: Record `name: (unnamed)`, `description: (none)`, and proceed.
-- **`~/.claude/` does not exist**: Skip the global scope scan. Note "Global scope unavailable" in the Ecosystem Health table.
+- **`<home>/.claude/` does not exist**: Skip the global scope scan. Note "Global scope unavailable" in the Ecosystem Health table.
 - **`ARCHITECTURE.md` exists but has no sentinel markers**: Append the full structure (including `<!-- START_METAMAP -->` / `<!-- END_METAMAP -->` markers) at the end of the file.
 - **Checklist item fails at Step 5**: Fix the violation before writing — do not write a broken graph. If a violation cannot be resolved deterministically (e.g., two components produce the same sanitized node ID after truncation), append `_2` to the second node ID and continue. Do not stop silently.
 
@@ -233,7 +241,7 @@ Before writing, verify:
 - [ ] Node count is within the correct scale rule
 - [ ] Collision table is filled (even if "None detected.")
 - [ ] Inventory table has one row per component found
-- [ ] Error handling applied for any missing frontmatter or absent `~/.claude/`
+- [ ] Error handling applied for any missing frontmatter or unresolvable home path
 
 ---
 
