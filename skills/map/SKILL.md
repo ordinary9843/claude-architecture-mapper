@@ -118,7 +118,16 @@ If a plugin appears under multiple hash-named or version-named subdirectories (e
 
 ## Step 3: Overlap Detection
 
-Compare all components pairwise. Flag a **collision** when ANY of these conditions are true:
+### 3a. Companion Detection (run first)
+
+Before collision checks, identify **companion relationships**: if component A's body text explicitly references component B by name (e.g., "delegates to the auditor agent", "invokes writing-plans skill"), record the pair as:
+- `companions[A] = B` with direction A → B
+
+Companions are **not collisions**. Mark them in the Collision Report with `🔗 Companion` and note the delegation direction. Do not apply severity rules to companion pairs.
+
+### 3b. Collision Detection (skip companion pairs)
+
+For all non-companion pairs, flag a **collision** when ANY of these conditions are true:
 
 1. **Same trigger**: Two components share an identical slash command (e.g., both respond to `/review`)
 2. **Semantic overlap**: Descriptions share 3+ core action verbs from this set: `review`, `audit`, `check`, `analyze`, `generate`, `create`, `fix`, `scan`, `map`, `debug`, `test`, `build`, `deploy`, `summarize`
@@ -211,7 +220,7 @@ Structure the full file as:
 | Component A | Component B | Reason | Severity |
 | :--- | :--- | :--- | :--- |
 
-(Write "None detected." if no collisions found.)
+(Write "None detected." if no collisions or companions found.)
 
 ## Ecosystem Health
 
