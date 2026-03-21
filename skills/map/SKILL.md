@@ -13,9 +13,14 @@ allowed-tools: Read, Glob, Grep, Write
 
 ## Step 1: Load Formatting Rules
 
-Read these two reference files before doing anything else:
-- `skills/map/references/mermaid-rules.md` — Mermaid syntax constraints (MUST follow)
-- `skills/map/references/doctor-rules.md` — Diagnostic thresholds for bloat and collision
+The base directory for this skill is printed in the `<command-message>` header as:
+`Base directory for this skill: <absolute-path>`
+
+Use that absolute path to construct all reference file paths. Never use relative paths or `~` with the Read tool.
+
+Read these two files before doing anything else:
+- `<base_dir>/references/mermaid-rules.md` — Mermaid syntax constraints (MUST follow)
+- `<base_dir>/references/doctor-rules.md` — Diagnostic thresholds for bloat and collision
 
 If either file cannot be read or is empty, report: `Error: required reference file [filename] not found or is empty. Reinstall the claude-architecture-mapper plugin.` and stop.
 
@@ -117,7 +122,7 @@ For each collision found, record:
 
 ### 4a. Stability Rules — HARD CONSTRAINTS
 
-Follow all rules in `skills/map/references/mermaid-rules.md`. Where a rule there conflicts with the scale rules below (e.g., the default `graph TD` vs `graph LR` for larger graphs), the scale rule takes priority.
+Follow all rules in `<base_dir>/references/mermaid-rules.md`. Where a rule there conflicts with the scale rules below (e.g., the default `graph TD` vs `graph LR` for larger graphs), the scale rule takes priority.
 
 ### 4b. Scale Rules — Auto-apply based on node count
 
@@ -129,7 +134,7 @@ Follow all rules in `skills/map/references/mermaid-rules.md`. Where a rule there
 
 ### 4c. Edge Types
 
-Follow edge type definitions in `skills/map/references/doctor-rules.md` §5 Visual Hierarchy Rules.
+Follow edge type definitions in `<base_dir>/references/doctor-rules.md` §5 Visual Hierarchy Rules.
 
 ### 4d. Node Structure
 
@@ -234,7 +239,7 @@ Before writing, verify:
 
 ## Examples
 
-See `skills/map/examples/` for concrete worked examples:
+See `<base_dir>/examples/` for concrete worked examples:
 - `01-small-environment.md` — happy path: 2 skills + 1 command, no collisions
 - `02-collision-detected.md` — trigger collision between two components
 - `03-no-artifacts.md` — edge case: empty environment, no plugins installed
